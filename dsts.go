@@ -7,15 +7,13 @@ import (
 )
 
 type page struct {
-	Title     string
-	Encoding  string
+	Title    string
+	Encoding string
 
-	content   bytes.Buffer
+	content  bytes.Buffer
 
-	openPage  string
-	closePage string
-	openBody  string
-	closeBody string
+	preContTempl  *template.Template
+	postContTempl *template.Template
 }
 
 type Html5Page struct {
@@ -27,15 +25,24 @@ func NewHtml5Page() *Html5Page {
 
 	p.Encoding = "utf-8"
 
-	p.openPage = `<!DOCTYPE html>
+	pre := `<!DOCTYPE html>
 <html>
 <head>
 <title>{{.Title}}</title>
 <meta http-equiv="Content-Type" content="text/html; charset={{.Encoding}}" />
+</head>
+<body>
 `
-	p.closePage = "</html>\n"
-	p.openBody  = "</head>\n<body>\n"
-	p.closeBody = "\n</body>\n"
+	post := `</body>
+</html>
+`
+
+	var err error
+	p.preContTempl, err = template.New("").Parse(pre)
+	if err != nil { panic(err) }
+
+	p.postContTempl, err = template.New("").Parse(post)
+	if err != nil { panic(err) }
 
 	return p
 }
@@ -47,12 +54,13 @@ func (p *page) Add(s string) {
 func (p page) String() string {
 	buf := new(bytes.Buffer)
 
-	tmpl, err := template.New("").Parse(p.openPage)
-	if err != nil { panic(err) }
-	err = tmpl.Execute(buf, p)
+	err := p.preContTempl.Execute(buf, p)
 	if err != nil { panic(err) }
 
-	fmt.Fprint(buf, p.openBody, p.content.String(), p.closeBody, p.closePage)
+	fmt.Fprintln(buf, p.content.String())
+
+	err = p.postContTempl.Execute(buf, p)
+	if err != nil { panic(err) }
 
 	return buf.String()
 }
