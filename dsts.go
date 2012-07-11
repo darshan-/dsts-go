@@ -8,10 +8,11 @@ import (
 type page struct {
 	Title    string
 	Encoding string
+	Styles   []string
+	Scripts  []string
 
 	content  bytes.Buffer
-
-	templ  *template.Template
+	templ    *template.Template
 }
 
 type Html5Page struct {
@@ -23,7 +24,13 @@ var html5TemplStr =
 <html>
 <head>
 <title>{{.Title}}</title>
-<meta http-equiv="Content-Type" content="text/html; charset={{.Encoding}}" />
+{{range .Styles}}` +
+`<link rel="stylesheet" href="{{.}}" type="text/css" />
+{{end}}` +
+`{{range .Scripts}}` +
+`<script type="text/javascript" src="{{.}}"></script>
+{{end}}` +
+`<meta http-equiv="Content-Type" content="text/html; charset={{.Encoding}}" />
 </head>
 <body>
 {{.Content}}
@@ -35,7 +42,6 @@ func NewHtml5Page() *Html5Page {
 	p := new(Html5Page)
 
 	p.Encoding = "utf-8"
-
 	p.templ, _ = template.New("").Parse(html5TemplStr)
 
 	return p
