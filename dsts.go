@@ -2,61 +2,57 @@ package dsts
 
 import (
 	"bytes"
+	"html/template"
+	"fmt"
 )
 
 type page struct {
 	Title     string
+	Encoding  string
+
 	content   bytes.Buffer
-}
 
-type Page interface {
-	Add(string)
-	getContent() string
-
-	openPage()  string
-	closePage() string
-	openBody()  string
-	closeBody() string
+	openPage  string
+	closePage string
+	openBody  string
+	closeBody string
 }
 
 type Html5Page struct {
 	page
 }
 
-func (p Html5Page) openPage() string {
-		return `<!DOCTYPE html>
+func NewHtml5Page() *Html5Page {
+	p := new(Html5Page)
+
+	p.Encoding = "utf-8"
+
+	p.openPage = `<!DOCTYPE html>
 <html>
 <head>
-<title>` + stripTags(p.Title) + `</title>
-<meta http-equiv="Content-Type" content="text/html; charset=#{encoding}" />
+<title>{{.Title}}</title>
+<meta http-equiv="Content-Type" content="text/html; charset={{.Encoding}}" />
 `
-}
+	p.closePage = "</html>\n"
+	p.openBody  = "</head>\n<body>\n"
+	p.closeBody = "\n</body>\n"
 
-func (p Html5Page) closePage() string {
-	return "</html>\n"
-}
-
-func (p Html5Page) openBody() string {
-	return "</head>\n<body>\n"
-}
-
-func (p Html5Page) closeBody() string {
-	return "\n</body>\n"
+	return p
 }
 
 func (p *page) Add(s string) {
 	p.content.WriteString(s)
 }
 
-func (p page) getContent() string {
-	return p.content.String()
-}
+func (p page) String() string {
+	buf := new(bytes.Buffer)
 
-func ToString(p Page) string {
-	return p.openPage() + p.openBody() + p.getContent() + p.closeBody() + p.closePage()
-}
+	tmpl, err := template.New("").Parse(p.openPage)
+	if err != nil { panic(err) }
+	err = tmpl.Execute(buf, p)
+	if err != nil { panic(err) }
 
-func stripTags(s string) string {
-//    s.gsub(/(<.*?>)/, "")
-	return s
+	fmt.Fprint(buf, p.openBody, p.content.String(), p.closeBody, p.closePage)
+
+	return buf.String()
 }
