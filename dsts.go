@@ -4,19 +4,26 @@ import (
 	"bytes"
 )
 
-type Page struct {
+type page struct {
 	Title     string
 	content   bytes.Buffer
-	openPage  func() string
-	closePage func() string
-	openBody  func() string
-	closeBody func() string
 }
 
-func NewHtml5Page() (*Page) {
-	p := new(Page)
+type Page interface {
+	Add(string)
+	getContent() string
 
-	p.openPage = func () string {
+	openPage()  string
+	closePage() string
+	openBody()  string
+	closeBody() string
+}
+
+type Html5Page struct {
+	page
+}
+
+func (p Html5Page) openPage() string {
 		return `<!DOCTYPE html>
 <html>
 <head>
@@ -25,27 +32,28 @@ func NewHtml5Page() (*Page) {
 `
 }
 
-	p.closePage = func() string {
-		return "</html>\n"
-	}
-
-	p.openBody = func() string {
-		return "</head>\n<body>\n"
-	}
-
-	p.closeBody = func() string {
-		return "\n</body>\n"
-	}
-
-	return p
+func (p Html5Page) closePage() string {
+	return "</html>\n"
 }
 
-func (p *Page) Add(s string) {
+func (p Html5Page) openBody() string {
+	return "</head>\n<body>\n"
+}
+
+func (p Html5Page) closeBody() string {
+	return "\n</body>\n"
+}
+
+func (p *page) Add(s string) {
 	p.content.WriteString(s)
 }
 
-func (p *Page) String() string {
-	return p.openPage() + p.openBody() + p.content.String() + p.closeBody() + p.closePage()
+func (p page) getContent() string {
+	return p.content.String()
+}
+
+func ToString(p Page) string {
+	return p.openPage() + p.openBody() + p.getContent() + p.closeBody() + p.closePage()
 }
 
 func stripTags(s string) string {
