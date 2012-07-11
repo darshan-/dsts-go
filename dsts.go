@@ -8,9 +8,9 @@ import (
 type page struct {
 	Title    string
 	Encoding string
-	Styles   []string
-	Scripts  []string
 
+	styles   []string
+	scripts  []string
 	content  bytes.Buffer
 	templ    *template.Template
 }
@@ -19,19 +19,18 @@ type Html5Page struct {
 	page
 }
 
-var html5TemplStr =
-`<!DOCTYPE html>
+var html5TemplStr = `<!DOCTYPE html>
 <html>
-<head>
-<title>{{.Title}}</title>
-{{range .Styles}}` +
-`<link rel="stylesheet" href="{{.}}" type="text/css" />
-{{end}}` +
-`{{range .Scripts}}` +
-`<script type="text/javascript" src="{{.}}"></script>
-{{end}}` +
-`<meta http-equiv="Content-Type" content="text/html; charset={{.Encoding}}" />
-</head>
+  <head>
+    <title>{{.Title}}</title>
+    {{range .Styles}}` +
+      `<link rel="stylesheet" href="{{.}}" type="text/css" />
+    {{end}}` +
+    `{{range .Scripts}}` +
+      `<script type="text/javascript" src="{{.}}"></script>
+    {{end}}` +
+    `<meta http-equiv="Content-Type" content="text/html; charset={{.Encoding}}" />
+  </head>
 <body>
 {{.Content}}
 </body>
@@ -51,8 +50,12 @@ func (p *page) Add(s string) {
 	p.content.WriteString(s)
 }
 
-func (p page) Content() string {
-	return p.content.String()
+func (p *page) AddStyle(s string) {
+	p.styles = append(p.styles, s)
+}
+
+func (p *page) AddScript(s string) {
+	p.scripts = append(p.scripts, s)
 }
 
 func (p page) String() string {
@@ -62,4 +65,19 @@ func (p page) String() string {
 	if err != nil { panic(err) }
 
 	return buf.String()
+}
+
+/* The following methods are exported for Go's template system
+ *   They are harmless but pointless for client code to use
+ */
+func (p page) Content() string {
+	return p.content.String()
+}
+
+func (p page) Styles() []string {
+	return p.styles
+}
+
+func (p page) Scripts() []string {
+	return p.scripts
 }
