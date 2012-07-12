@@ -2,7 +2,7 @@ package dsts
 
 import (
 	"bytes"
-	"html/template"
+	"text/template"
 	"strings"
 )
 
