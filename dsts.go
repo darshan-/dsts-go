@@ -1,5 +1,49 @@
 package dsts
 
+/*******************************************************************************
+ *
+ * Client interface:
+ *
+ *  1. Instantiate a page creation object, likely specifiying the format it will generate
+ *    e.g. p := NewHtml5Page()
+ *
+ *  2. Optionally set properties and add content
+ *    e.g. p.Title = "Help"
+ *         p.AddScript("default.css")
+ *         p.Add("<p>Once upon a time...</p>\n")
+ *
+ *  3. Generate the page
+ *    e.g. p.String()
+ *
+ *  4. And the tricky part: Make it extensible, such that a website named Egg Sample could easily
+ *    leverage the library to make new formats based on existing ones, which themselves can form the
+ *    basis of subformats:
+ *      e.g. p  := NewEggSamplePage()
+ *           p2 := NewEggSampleForumPage()
+ *
+ *
+ *  Points where sub-formats can add content:
+ *    * At the end of the html <head>
+ *    * At the beginning of the html <body>
+ *    * At the end of the html <body>
+ *
+ *  So HtmlPage struct has a string or bytes.Buffer for each of those,
+ *    the constructor for each of those calls it's "super's" constructor,
+ *    then adds to those
+ *
+ *  You get either the top of Xhtml or Html5, depending on which you chose, then
+ *    The title and header according to your title, scripts, and styles
+ *    Then the extra headers stuff, first from the super then decending down to the final subtype last
+ *    Then the extra body-top stuff, first from the super, decending down to the final subtype last
+ *    Then the extra body-bottom stuff, first from the super, decending down to the final subtype last
+ *    The end of all html-type pages
+ *
+ *
+ ******************************************************************************/
+
+
+
+
 import (
 	"bytes"
 	"strings"
