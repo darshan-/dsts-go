@@ -26,8 +26,8 @@ type HtmlPage struct {
 	bodyBottom string
 	docBottom  string
 
-	styles    []string
-	scripts   []string
+	styles  []string
+	scripts []string
 }
 
 type Html5Page struct {
@@ -65,7 +65,7 @@ func (p *XhtmlPage) String() string {
 	return p.HtmlPage.String()
 }
 
-func NewHtmlPage() (*HtmlPage) {
+func NewHtmlPage() *HtmlPage {
 	p := new(HtmlPage)
 
 	p.docTop     = "<html>\n"
@@ -80,7 +80,7 @@ func NewHtmlPage() (*HtmlPage) {
 	return p
 }
 
-func NewHtml5Page() (*Html5Page) {
+func NewHtml5Page() *Html5Page {
 	p := new(Html5Page)
 
 	p.HtmlPage = NewHtmlPage()
@@ -90,7 +90,7 @@ func NewHtml5Page() (*Html5Page) {
 	return p
 }
 
-func NewXhtmlPage() (*XhtmlPage) {
+func NewXhtmlPage() *XhtmlPage {
 	p := new(XhtmlPage)
 
 	p.HtmlPage = NewHtmlPage()
