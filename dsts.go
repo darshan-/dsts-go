@@ -18,13 +18,15 @@ type HtmlPage struct {
 	Encoding   string
 	HeadExtras string
 
-	docTop     string
-	headTop    string
-	headBottom string
-	bodyTop    string
-	bodyAttrs  string
-	bodyBottom string
-	docBottom  string
+	// Exported, but meant as "protected" fields, to be optionally modified by
+	//  "subclass" outside of this package
+	DocTop     string
+	HeadTop    string
+	HeadBottom string
+	BodyTop    string
+	BodyAttrs  string
+	BodyBottom string
+	DocBottom  string
 
 	styles  []string
 	scripts []string
@@ -45,16 +47,16 @@ func (p *Page) String() string {
 }
 
 func (p *HtmlPage) String() string {
-	p.preContent = p.docTop + p.headTop +
+	p.preContent = p.DocTop + p.HeadTop +
 		p.titleStr() + p.stylesStr() + p.scriptsStr() + p.contentTypeStr() +
-		p.HeadExtras + p.headBottom + p.bodyTop
-	p.postContent = p.bodyBottom + p.docBottom
+		p.HeadExtras + p.HeadBottom + p.BodyTop
+	p.postContent = p.BodyBottom + p.DocBottom
 
 	return p.Page.String()
 }
 
 func (p *XhtmlPage) String() string {
-	p.docTop = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 ` +
+	p.DocTop = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 ` +
 		strings.ToUpper(p.Doctype) +
 		`//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-` +
 		strings.ToLower(p.Doctype) +
@@ -68,12 +70,12 @@ func (p *XhtmlPage) String() string {
 func NewHtmlPage() *HtmlPage {
 	p := new(HtmlPage)
 
-	p.docTop     = "<html>\n"
-	p.headTop    = "  <head>\n"
-	p.headBottom = "  </head>\n"
-	p.bodyTop    = "<body>\n"
-	p.bodyBottom = "</body>\n"
-	p.docBottom  = "</html>\n"
+	p.DocTop     = "<html>\n"
+	p.HeadTop    = "  <head>\n"
+	p.HeadBottom = "  </head>\n"
+	p.BodyTop    = "<body>\n"
+	p.BodyBottom = "</body>\n"
+	p.DocBottom  = "</html>\n"
 
 	p.Encoding = "utf-8"
 
@@ -85,7 +87,7 @@ func NewHtml5Page() *Html5Page {
 
 	p.HtmlPage = NewHtmlPage()
 
-	p.docTop = "<!DOCTYPE html>\n<html>\n"
+	p.DocTop = "<!DOCTYPE html>\n<html>\n"
 
 	return p
 }
@@ -95,8 +97,8 @@ func NewXhtmlPage() *XhtmlPage {
 
 	p.HtmlPage = NewHtmlPage()
 
-	p.docTop  = ""
-	p.headTop = `  <head profile="http://www.w3.org/2005/10/profile">` + "\n"
+	p.DocTop  = ""
+	p.HeadTop = `  <head profile="http://www.w3.org/2005/10/profile">` + "\n"
 
 	p.Doctype = "strict"
 
