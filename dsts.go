@@ -87,7 +87,7 @@ func NewHtml5Page() *Html5Page {
 
 	p.HtmlPage = NewHtmlPage()
 
-	p.DocTop = "<!DOCTYPE html>\n<html>\n"
+	p.DocTop = "<!DOCTYPE html>\n" + p.DocTop
 
 	return p
 }
